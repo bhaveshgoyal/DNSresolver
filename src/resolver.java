@@ -18,7 +18,7 @@ public class resolver {
 	static int q_type = Type.A;
 	
 	static String query = "google.co.jp";
-	public static void main(String[] args) throws IOException {
+	public static void mhain(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		List<String> curr_lvl_servers = root_servers;
 		System.out.println(Name.root);
@@ -30,6 +30,7 @@ public class resolver {
 				Record record = Record.newRecord(name, q_type, q_class);
 				Message msg_q = Message.newQuery(record);
 				Message resp = resolver.send(msg_q);
+				
 				if (resp.toString().contains("status: NOERROR")) {
 					System.out.print("Response: " + resp.toString());
 					if (resp.getSectionArray(Section.ANSWER).length == 0) {
