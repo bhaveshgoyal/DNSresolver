@@ -114,4 +114,78 @@ google.com.     345600  IN  NS  ns1.google.com.
 Query Time: 1604 msec
 WHEN: Mon Feb 19 16:48:23 2018
 MSG SIZE rcvd: 276
+
+-----------------
+*DNSSEC Enabled:*
+
+bagl ❯❯❯ ./resolversec paypal.com A
+javac -cp "./src/*:lib/dnsjava-2.1.8.jar" src/resolversec.java -d ./bin
+Note: src/resolversec.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+java -cp "bin/:lib/dnsjava-2.1.8.jar" resolversec paypal.com A
+Zone SIGNER: paypal.com.
+DNS Footprint Found: 11811
+Self-signed DNSKEY Verified for: paypal.com.
+DS SIGNER: paypal.com.
+Validating Parent-Child DS Records...
+Zone SIGNER: com.
+DNS Footprint Found: 46967
+DS SIGNER: com.
+Validating Parent-Child DS Records...
+Zone SIGNER: .
+DNS Footprint Found: 41824
+DS SIGNER: .
+
+DNSSEC: SUCCESS. Record Verified
+
+DNSSEC: SUCCESS. Record Verified
+
+QUESTION SECTION:
+paypal.com.     0   IN  A
+
+ANSWER SECTION:
+paypal.com.     79  IN  A   64.4.250.32
+paypal.com.     79  IN  A   64.4.250.33
+
+Query Time: 38385 msec
+WHEN: Mon Feb 19 18:20:42 2018
+MSG SIZE rcvd: 241
+
+
+bagl ❯❯❯ ./resolversec dnssec-failed.org A
+javac -cp "./src/*:lib/dnsjava-2.1.8.jar" src/resolversec.java -d ./bin
+Note: src/resolversec.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+java -cp "bin/:lib/dnsjava-2.1.8.jar" resolversec dnssec-failed.org A
+
+DNSSEC: Error Verifying Records for: dnssec-failed.org
+
+QUESTION SECTION:
+dnssec-failed.org.  0   IN  A
+
+ANSWER SECTION:
+dnssec-failed.org.  7200    IN  A   69.252.80.75
+
+Query Time: 8285 msec
+WHEN: Mon Feb 19 18:23:46 2018
+MSG SIZE rcvd: 51
+
+
+bagl ❯❯❯ ./resolversec bhaveshgoyal.xyz A
+javac -cp "./src/*:lib/dnsjava-2.1.8.jar" src/resolversec.java -d ./bin
+Note: src/resolversec.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+java -cp "bin/:lib/dnsjava-2.1.8.jar" resolversec bhaveshgoyal.xyz A
+
+DNSSEC: DNSSEC not supported
+
+QUESTION SECTION:
+bhaveshgoyal.xyz.   0   IN  A
+
+ANSWER SECTION:
+bhaveshgoyal.xyz.   299 IN  A   52.76.213.87
+
+Query Time: 5989 msec
+WHEN: Mon Feb 19 18:24:04 2018
+MSG SIZE rcvd: 61
 ```
