@@ -1,0 +1,1 @@
+make dns host=$1 type=$2

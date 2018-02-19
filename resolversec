@@ -1,0 +1,1 @@
+make dnssec host=$1 type=$2
