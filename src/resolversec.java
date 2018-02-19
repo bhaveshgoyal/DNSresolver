@@ -29,7 +29,6 @@ public class resolversec {
 	public static void main(String[] args) throws IOException {
 		
 		List<String> curr_lvl_servers = root_servers;
-		System.out.println(Name.root);
 		
 		if (args.length == 1){
             query = args[0];

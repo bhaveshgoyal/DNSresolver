@@ -10,15 +10,14 @@ Download source: http://www.dnsjava.org/download/
 
 git clone https://github.com/bhaveshgoyal/DNSresolver.git
 cd DNSresolver/
+make
 
 For DNSResolver without DNSSEC:
-make dns
 chmod +x ./resolver
 ./resolver <Host-name> [Type: A | MX | NS]
 
 
-For DNSResolver with DNSSEC:
-make dnssec
+For DNSResolver with DNSSEC: (Ignore Any Warnings)
 chmod +x ./resolversec
 ./resolversec <Host-name> [Type: A | MX | NS]
 ```
