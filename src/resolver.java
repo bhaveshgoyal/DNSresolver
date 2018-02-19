@@ -1,9 +1,12 @@
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
+import java.util.Date;
+import java.lang.System.*;
+import java.text.SimpleDateFormat;
 import org.xbill.DNS.*;
 
 
@@ -18,6 +21,10 @@ public class resolver {
 	static int q_type = Type.A;
 	
 	static String query = "google.com";
+	static Record[] final_rec;
+	static long q_start = 0;
+	static long q_end = 0;
+	static String when = "";
 	public static void main(String[] args) throws IOException {
 		
 		List<String> curr_lvl_servers = root_servers;
@@ -49,21 +56,34 @@ public class resolver {
 		
 		for(int i = 0; i < args.length; i++)
 			System.out.println(args[i]);
-		
-		for(int i = 0; i < curr_lvl_servers.size(); i++) {
+		int i = 0;
+		when = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy").format(new Date());
+		q_start = System.nanoTime();
+		for(;i < curr_lvl_servers.size(); i++) {
 			String r_server = curr_lvl_servers.get(i);
 			try {
-				SimpleResolver resolver = new SimpleResolver(r_server);
-				Name name = Name.fromString(query, Name.root);
-				Record record = Record.newRecord(name, q_type, q_class);
-				Message msg_q = Message.newQuery(record);
-				Message resp = resolver.send(msg_q);
 				
+                Name name = Name.fromString(query, Name.root);
+                Message resp = null;
+                try {
+                        resp = getResp(r_server, name, q_type);
+                }
+                catch(Exception e) {
+                        try {
+                                System.out.println("Socket Timeout Out (" + r_server + "). Retrying DNS Query...");
+                                resp = getResp(r_server, name, q_type);
+                        }
+                        catch (Exception e1) {
+                                System.out.println("No response from DNS Query Server " + r_server + ". Trying next (available) server...");
+                                throw new SocketTimeoutException();
+                        }
+                }
+
 				if (resp.toString().contains("status: NOERROR")) {
-					System.out.print("Response: " + resp.toString());
+//					System.out.print("Response: " + resp.toString());
 					if (resp.getSectionArray(Section.ANSWER).length == 0) {
 						curr_lvl_servers = getAuthServers(resp);
-						i = 0;
+						i = -1;
 						continue;
 					}
 					else {
@@ -71,15 +91,16 @@ public class resolver {
 						Record[] answers = resp.getSectionArray(Section.ANSWER);
 						
 						for(Record ans_record: answers) {
-							if (ans_record.getType() == Type.A) {
-								System.out.println("\nANS: " + ans_record.rdataToString());
+							if (ans_record.getType() == q_type) {
+								q_end = System.nanoTime();
+								present(resp, q_end - q_start);
 								return;
 							}
 							else if (ans_record.getType() == Type.CNAME) {
 								System.out.println("\nCNAME found: " + ans_record.rdataToString());
 								query = ans_record.rdataToString();
 								curr_lvl_servers = root_servers;
-								i = 0;
+								i = -1;
 								continue;
 							}
 						}
@@ -90,19 +111,49 @@ public class resolver {
 				}
 			}
 			catch(Exception e){
-				System.out.println("Query Exception:\n" + e.toString());
+//				System.out.println("Query Exception:\n" + e.toString());
 			}
 		}
+	}
+	public static void present(Message output, long lapsed){
+		System.out.println("\nQUESTION SECTION:");
+
+		Record quest = output.getQuestion();
+		System.out.println(quest.toString() + "\n");
+		
+		System.out.println("ANSWER SECTION:");
+		
+		Record[] answers = output.getSectionArray(Section.ANSWER);
+						
+		for(Record ans_record: answers) {
+			if (ans_record.getType() == q_type) {
+				System.out.println(ans_record.toString());
+			}
+		}
+		
+		System.out.println("\nQuery Time: " + lapsed/(1000000) + " msec");
+		System.out.println("WHEN: " + when);
+		System.out.println("MSG SIZE rcvd: " + output.numBytes());
+	
 	}
 	public static List<String> getAuthServers(Message msg) {
 		
 		List<String> authservers = new ArrayList<String>();
 		Record[] authrecs = msg.getSectionArray(Section.AUTHORITY);
 		for(Record record: authrecs) {
-			authservers.add(strip(record.getAdditionalName().toString()));
+			if (record.getAdditionalName() != null)
+				authservers.add(strip(record.getAdditionalName().toString()));
 		}
 		return authservers;
 	}
+	public static Message getResp(String r_server, Name signer, int type) throws IOException {
+        SimpleResolver resolver = new SimpleResolver(r_server);
+        resolver.setEDNS(0, 0, Flags.DO, null);
+        Record record = Record.newRecord(signer, type, q_class);
+        Message msg_q = Message.newQuery(record);
+        Message resp = resolver.send(msg_q);
+        return resp;
+    }
 	private static String strip(String str) {
 		int size = str.length();
 		return str.substring(0, size - 1);
