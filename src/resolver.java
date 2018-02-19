@@ -28,7 +28,7 @@ public class resolver {
 	public static void main(String[] args) throws IOException {
 		
 		List<String> curr_lvl_servers = root_servers;
-		System.out.println(Name.root);
+//		System.out.println(Name.root);
 		if (args.length == 1){
 			query = args[0];	
 			q_type = Type.A;
@@ -54,8 +54,6 @@ public class resolver {
 		else
 			System.out.println("Invalid Number of arguments. Usage: ./resolver <host-name> [type]");
 		
-		for(int i = 0; i < args.length; i++)
-			System.out.println(args[i]);
 		int i = 0;
 		when = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy").format(new Date());
 		q_start = System.nanoTime();
@@ -80,7 +78,7 @@ public class resolver {
                 }
 
 				if (resp.toString().contains("status: NOERROR")) {
-//					System.out.print("Response: " + resp.toString());
+	//				System.out.print("Response: " + resp.toString());
 					if (resp.getSectionArray(Section.ANSWER).length == 0) {
 						curr_lvl_servers = getAuthServers(resp);
 						i = -1;
@@ -111,7 +109,7 @@ public class resolver {
 				}
 			}
 			catch(Exception e){
-//				System.out.println("Query Exception:\n" + e.toString());
+	//			System.out.println("Query Exception:\n" + e.toString());
 			}
 		}
 	}
