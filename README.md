@@ -40,6 +40,28 @@ When started, the program first performs some prelim checks to verify the argume
 *Note:* The program measures the query time completely between the moment it contacts the first root server for the response to the point till it resolves a final resolution.
 
 ----------------------------
+**Testing Environment**
+
+```
+Java specifications:
+java 9.0.1
+Java(TM) SE Runtime Environment (build 9.0.1+11)
+
+Dependencies: 
+dnsjava-2.1.8 (stable)
+
+OS specifications:
+-Darwin 17.0.0 x86_64
+(macOS High Sierra)
+
+VPN Client:
+Tunnelblick
+
+OVPN config ISP:
+vpn181181245.opengw.net
+Config File Type: TCP/UDP supported
+```
+
 **Sample Program Output:**
 ```
 bagl ❯❯❯ ./resolver google.com A
